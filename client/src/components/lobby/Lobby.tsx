@@ -91,10 +91,10 @@ export default function Lobby() {
         {localPlayer ? (
           <button
             onClick={actions.toggleReady}
-            className="px-5 py-2 bg-green-600/50 w-fit hover:bg-green-500/50 data-[ready=true]:bg-red-600/50 data-[ready=true]:hover:bg-red-500/50 text-zinc-300 rounded-xl font-bold drop-shadow cursor-pointer"
+            className="px-5 py-2 bg-red-600/50 w-fit hover:bg-red-500/50 data-[ready=true]:bg-green-600/50 data-[ready=true]:hover:bg-green-500/50 text-zinc-300 rounded-xl font-bold drop-shadow cursor-pointer"
             data-ready={localPlayer.ready}
           >
-            {localPlayer.ready ? "Not Ready" : "Ready"}
+            {!localPlayer.ready ? "Not Ready" : "Ready"}
           </button>
         ) : (
           <button
