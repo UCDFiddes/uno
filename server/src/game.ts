@@ -16,7 +16,7 @@ export default class GameManager {
   current_direction: 1 | -1;
   players: Player[];
 
-  database: DatabaseManager;
+  database_manager: DatabaseManager;
   deck_manager: DeckManager | null;
 
   constructor(io: ServerType) {
@@ -32,7 +32,7 @@ export default class GameManager {
     this.players = [];
 
     // Init the database manager.
-    this.database = new DatabaseManager();
+    this.database_manager = new DatabaseManager();
 
     // Setup an interval that will be used to check if a player has not picked up a card in time.
     setInterval(() => {
@@ -74,7 +74,7 @@ export default class GameManager {
 
   // Get the database users for the current connections.
   async getDatabaseUsers() {
-    return await this.database.getUsers(Array.from(this.connections.values()).map((p) => p.user_id));
+    return await this.database_manager.getUsers(Array.from(this.connections.values()).map((p) => p.user_id));
   }
 
   // Used to sync all state with all connections.
@@ -124,7 +124,7 @@ export default class GameManager {
       return;
     }
 
-    await this.database.updateName(connection.user_id, name);
+    await this.database_manager.updateName(connection.user_id, name);
     this.sync();
   }
 
@@ -313,7 +313,7 @@ export default class GameManager {
     const win_leaderboard = players.sort(
       (a, b) => this.deck_manager.player_decks[a.position].length - this.deck_manager.player_decks[b.position].length,
     );
-    this.database.incrementWins(win_leaderboard[0].user_id);
+    this.database_manager.incrementWins(win_leaderboard[0].user_id);
     win_leaderboard[0].wins++;
 
     // Emit the win event and reset the game so users can see who wins.
