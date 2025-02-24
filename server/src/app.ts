@@ -14,8 +14,8 @@ export type SocketType = Socket<ClientToServerEvents, ServerToClientEvents, Inte
 
 // Read SSL certificate and key files
 const options = {
-  key: readFileSync(path.join(__dirname, "../keys/selfsigned.key")),
-  cert: readFileSync(path.join(__dirname, "../keys/selfsigned.crt")),
+  key: readFileSync(path.join(__dirname, "../keys/private.key")),
+  cert: readFileSync(path.join(__dirname, "../keys/certificate.crt")),
 };
 
 // Initialize the server and websocket.
