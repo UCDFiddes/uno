@@ -9,7 +9,7 @@ import { CardColour } from "config/deck";
 const searchParams = new URLSearchParams(window.location.search);
 
 // Handle socket authentication and connection with persistant session_id.
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(searchParams.get("server") ?? "http://localhost:4000", {
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(searchParams.get("server") ?? "", {
   autoConnect: false,
 });
 

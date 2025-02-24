@@ -21,6 +21,7 @@ const io: ServerType = new Server(server, {
 
 // Enable CORS.
 app.use(cors());
+app.use(express.static("build"));
 
 // Identify the connection with a session ID.
 io.use((socket, next) => {
