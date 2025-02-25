@@ -20,8 +20,8 @@ export default class DatabaseManager {
     this.database.exec(`
       CREATE TABLE IF NOT EXISTS users (
         id TEXT PRIMARY KEY,
-        name TEXT,
-        wins INTEGER
+        name TEXT NOT NULL,
+        wins INTEGER DEFAULT 0
       );
     `);
   }

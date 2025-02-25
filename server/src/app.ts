@@ -1,6 +1,6 @@
 import cors from "cors";
 import express from "express";
-import { createServer } from "node:https";
+import { createServer } from "node:http";
 import { Server, Socket } from "socket.io";
 import { ServerToClientEvents, ClientToServerEvents, InterServerEvents, SocketData } from "config/socket";
 import { uid } from "uid";
@@ -20,7 +20,7 @@ const options = {
 
 // Initialize the server and websocket.
 const app = express();
-const server = createServer(options, app);
+const server = createServer(app);
 const io: ServerType = new Server(server, {
   cors: {
     origin: "*",
