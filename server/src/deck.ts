@@ -1,5 +1,5 @@
-import { uid } from "uid";
-import { Card, CardAbility, CardColour, Reaction } from "config/deck";
+import { uid } from "uid"; // A function for creating unique identifiers.
+import { Card, CardAbility, CardColour, Reaction } from "config/deck"; // Imports enums and types from config folder.
 
 // Class to manage the deck of cards.
 export default class DeckManager {
@@ -53,7 +53,9 @@ export default class DeckManager {
   // Shuffle the deck of cards.
   shuffleDeck() {
     for (let i = this.deck.length - 1; i > 0; i--) {
+      // Generate a random index between 0 and i.
       const j = Math.floor(Math.random() * i);
+      // Swap the cards at index i and j.
       const temp = this.deck[i];
       this.deck[i] = this.deck[j];
       this.deck[j] = temp;
@@ -64,6 +66,7 @@ export default class DeckManager {
   pickupCard(player_position: number): Reaction[] {
     if (this.deck.length > 1) {
       let new_card = this.deck.shift();
+      // If the new card is a wild or collect 4 card, set the colour to null.
       if ([CardAbility.Wild, CardAbility.Collect4].includes(new_card.ability)) new_card.colour = null;
       this.player_decks[player_position].push(new_card);
     }
@@ -83,6 +86,7 @@ export default class DeckManager {
     // If the top card is a wild or collect 4 card without a specified colour, any card can be placed.
     if ((this.top_card.ability === "wild" || this.top_card.ability === "collect4") && !this.top_card.colour) return true;
 
+    // Check if the card is placeable based on the colour, number or ability.
     if (card.colour === this.top_card.colour) return true;
     if (typeof card.number === "number" && card.number === this.top_card.number) return true;
     if (card.ability && card.ability === this.top_card.ability) return true;

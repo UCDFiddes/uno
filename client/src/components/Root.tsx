@@ -4,8 +4,10 @@ import Lobby from "./lobby/Lobby";
 
 // Main function to handle the routing between the lobby and the game and show a loading state while the socket is connecting.
 export default function Root() {
+  // Access the game state. via the context provider.
   const { game } = useStateContext();
 
+  // If there is no game display a loading state.
   if (!game)
     return (
       <div className="flex items-center justify-center flex-col min-h-dvh text-center text-zinc-300 bg-zinc-800">

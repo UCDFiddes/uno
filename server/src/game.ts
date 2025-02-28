@@ -1,8 +1,9 @@
-import { Connection } from "config/connections";
-import { MAX_PLAYERS, MIN_PLAYERS, TIMEOUT } from "config/CONSTANTS";
-import { CardColour, Reaction } from "config/deck";
-import { GameStatus, Player } from "config/game";
-import { ServerType, SocketType } from "./app";
+import { Connection } from "config/connections"; // Types for socket connections.
+import { MAX_PLAYERS, MIN_PLAYERS, TIMEOUT } from "config/CONSTANTS"; // Constants used for managing the game.
+import { CardColour, Reaction } from "config/deck"; // Enum for card colours and reaction types.
+import { GameStatus, Player } from "config/game"; // Enums for game status and player types.
+import { ServerType, SocketType } from "./app"; // Types for the web sockets server and clients.
+
 import DeckManager from "./deck";
 import DatabaseManager from "./database";
 
@@ -23,6 +24,7 @@ export default class GameManager {
     // Handle the socket connectiosn and updates for new connections.
     this.io = io;
     this.connections = new Map();
+    // Handle all new requests in the onConneciton handler.
     io.on("connection", (s) => this.onConnection(s));
 
     // Init the game state.
@@ -36,6 +38,7 @@ export default class GameManager {
 
     // Setup an interval that will be used to check if a player has not picked up a card in time.
     setInterval(() => {
+      // Check if the game is playing, find the current player.
       if (this.status !== GameStatus.Playing) return;
       const player = this.players.find((p) => p.position === this.current_position);
 
@@ -49,7 +52,7 @@ export default class GameManager {
 
   // Handle a new connection.
   onConnection(socket: SocketType) {
-    // Identify the connection using a session requesting them to save their user_id and session_id.
+    // Requesting the client to save their user_id and session_id.
     socket.emit("session", socket.data.user_id, socket.data.session_id);
     console.log(`✔️: Connection identified as ${socket.data.user_id}/${socket.data.session_id}.`);
 
@@ -57,7 +60,7 @@ export default class GameManager {
     this.connections.set(socket.id, { user_id: socket.data.user_id, session_id: socket.data.session_id });
     this.sync();
 
-    // Handle the socket events forwarding them to the respective functions.
+    // Handle the socket events forwarding them to the respective handlers within the class.
     socket.on("game/join", () => this.joinRequest(socket.id));
     socket.on("game/toggle-ready", () => this.toggleReadyRequest(socket.id));
     socket.on("game/pickup-card", () => this.pickupCard(socket.id));
@@ -74,6 +77,7 @@ export default class GameManager {
 
   // Get the database users for the current connections.
   async getDatabaseUsers() {
+    // Requests the database manager to get the users for the current connections, including from the cache.
     return await this.database_manager.getUsers(Array.from(this.connections.values()).map((p) => p.user_id));
   }
 
@@ -101,10 +105,14 @@ export default class GameManager {
   // Used to resolve the players with the database users to include their names, wins and current decks
   async resolvePlayers() {
     const database_users = await this.getDatabaseUsers();
+
+    // Map the players and include their user data from the database and their current deck.
     return this.players.map((player) => {
       const user = database_users.find((u) => u.id === player.user_id);
+      // If there is currently not any deck then return a empty array.
       const deck = this.deck_manager ? this.deck_manager.player_decks[player.position] : [];
 
+      // Return the player with the user data and deck.
       return {
         ...player,
         name: user?.name ?? player.user_id,
@@ -160,12 +168,12 @@ export default class GameManager {
       return;
     }
 
-    // Add the player to the game and sync the state.
+    // Add the player to the game (with sensible default data) and sync the state.
     this.players.push({
       user_id: connection.user_id,
       name: connection.user_id,
       wins: 0,
-      position: 999,
+      position: 999, // Set to a high number so it can be reorganized later.
       ready: false,
       deadline: null,
       deck: [],
@@ -249,7 +257,7 @@ export default class GameManager {
     this._pickupCard(this.players[existing_player].position, socket_id);
   }
 
-  // Backend function to pick up a card.
+  // Backend function to pick up a card that doesnt havent any checks.
   _pickupCard(player_position: number, socket_id?: string) {
     const reactions = this.deck_manager.pickupCard(player_position);
     this.handleReactions(reactions, socket_id);
@@ -297,7 +305,7 @@ export default class GameManager {
     this._placeCard(this.players[existing_player].position, card_id, selected_colour, socket_id);
   }
 
-  // Backend function to place a card.
+  // Backend function to place a card that doesnt have any checks.
   _placeCard(player_position: number, card_id: string, selected_colour?: CardColour, socket_id?: string) {
     const reactions = this.deck_manager.placeCard(player_position, card_id, selected_colour);
     this.handleReactions(reactions, socket_id);
@@ -314,7 +322,7 @@ export default class GameManager {
       (a, b) => this.deck_manager.player_decks[a.position].length - this.deck_manager.player_decks[b.position].length,
     );
     this.database_manager.incrementWins(win_leaderboard[0].user_id);
-    win_leaderboard[0].wins++;
+    win_leaderboard[0].wins++; // Increment wins locally as the win_leaderboard is old data.
 
     // Emit the win event and reset the game so users can see who wins.
     this.io.emit("game/end", win_leaderboard);
