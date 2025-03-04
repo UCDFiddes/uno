@@ -14,7 +14,7 @@ const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(searchPara
 });
 
 // Retirve the user_id and session_id from local storage and connect to the server.
-const current_user_id = localStorage.getItem("user_id");
+const current_user_id = searchParams.get("user_id") ?? localStorage.getItem("user_id");
 const current_session_id = sessionStorage.getItem("session_id");
 socket.auth = { user_id: current_user_id, session_id: current_session_id };
 socket.connect();
